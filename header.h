@@ -31,6 +31,18 @@ int readbit(int port, int bit, robot_link& rlink);
 //functions declared in movement.cc
 void forwards(robot_link& rlink, int stopatthisnumofintersections);
 
+//declarations of movement.cc functions that havent been wrote yet
+void right(robot_link& rlink);
+void left(robot_link& rlink);
+void spin(robot_link& rlink);
+void forwards_untill_impact(robot_link& rlink); 
+void back_to_line(robot_link& rlink);
+void backwards(robot_link& rlink, int numintersections);
+void backwardspedal(robot_link& rlink, int time);
+void forwardspedal(robot_link& rlink, int time);
+
+
+
 enum enum_matchings {
 	//Matches enums for use in move_from
 	start_to_ball1 = 0,
@@ -39,7 +51,7 @@ enum enum_matchings {
 	ball3_to_ball4 = 3,
 	ball4_to_ball5 = 4,
 	ball5_to_ball6 = 5,
-	ball_6_to_ref = 9,
+	ball6_to_ref = 9,
 	ref_to_D1 = 10,
 	D1_to_ref = 11,
 	ref_to_D2 = 20,
