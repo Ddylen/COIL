@@ -31,6 +31,7 @@ int readbit(int port, int bit, robot_link& rlink);
 //functions declared in movement.cc
 void forwards(robot_link& rlink, int stopatthisnumofintersections);
 
+
 //declarations of movement.cc functions that havent been wrote yet
 void right(robot_link& rlink);
 void left(robot_link& rlink);
@@ -41,6 +42,8 @@ void backwards(robot_link& rlink, int numintersections);
 void backwardspedal(robot_link& rlink, int time);
 void forwardspedal(robot_link& rlink, int time);
 
+//functions declared in loading.cc
+bool get_weight(robot_link& rlink);
 
 
 enum enum_matchings {
