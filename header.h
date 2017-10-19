@@ -1,9 +1,9 @@
 #include <iostream>
 #include <robot_instr.h>
 #include <robot_link.h>
-
+#include <vector>
 #define ROBOT_NUM 2
-//using namespace std;
+using namespace std;
 
 void initialise(robot_link& rlink){
 	//initialises the robot link
@@ -44,6 +44,7 @@ void forwardspedal(robot_link& rlink, int time);
 
 //functions declared in loading.cc
 bool get_weight(robot_link& rlink);
+vector<string> colourlist;
 
 
 enum enum_matchings {

@@ -33,3 +33,26 @@ bool get_weight(robot_link& rlink) {
 	
 	return was_weight_switch_pressed;
 }
+
+/*
+void measure_colour(robot_link& rlink){
+	int colour_value = rlink.request(ADC0);
+	char colour = "I"; // for invalid
+	// all thresholds here are arbitrary, need to be tested
+	if (colour_value < 60 && colour_value >0){
+		colour = "W";  // for white
+	}
+	
+	if (colour_value < 120 && colour_value >90){
+		colour = "Y";  // for yellow
+	}
+	
+	if (colour_value < 250 && colour_value >200){
+		colour = "M";  // for multicolour
+	}
+	colourlist.push_back(colour); //adds colour to global list
+	
+	
+}
+*/
+// the above is throwing some weird errors, not sure why

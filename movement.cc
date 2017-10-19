@@ -219,11 +219,6 @@ void sweepforline(robot_link& rlink){
 			cout << "Time out as arc took over 10 seconds, robot is lost" << endl;
 			throw "Time out as arc took over 10 seconds, robot is lost" ;
 		}
-	
-	
-	
-	
-	
 }
 }
 }

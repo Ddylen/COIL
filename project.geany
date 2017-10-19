@@ -1,22 +1,13 @@
 [project]
-name=read
-base_path=/homes/arc82/idp_code/COIL
+name=a.out
+base_path=/homes/dakd2/Desktop/idp_shared/Common/Software/Functions
 make_in_base_path=true
 description=1B IDP
-run_cmd=./read
+run_cmd=./a.out
  
 [files]
 current_page=1
-FILE_NAME_0=0;C++;0;16;1;1;0;reading.cc;0
-FILE_NAME_1=0;C++;0;16;1;1;0;read.o;0
-FILE_NAME_2=0;C++;0;16;1;1;0;read.cc;0
-FILE_NAME_3=0;C++;0;16;1;1;0;read;0
-FILE_NAME_4=0;C++;0;16;1;1;0;project.geany;0
-FILE_NAME_5=0;C++;0;16;1;1;0;movement.cc;0
-FILE_NAME_6=0;C++;0;16;1;1;0;Makefile;0
-FILE_NAME_7=0;C++;0;16;1;1;0;header.h.gch;0
-FILE_NAME_8=0;C++;0;16;1;1;0;header.h;0
-FILE_NAME_9=0;C++;0;16;1;1;0;forwards.cc;0
+FILE_NAME_0=0;C++;0;16;1;1;0;loading.cc;0
  
 [indentation]
 indent_width=4
