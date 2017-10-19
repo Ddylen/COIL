@@ -31,6 +31,9 @@ int readbit(int port, int bit, robot_link& rlink);
 //functions declared in movement.cc
 void forwards(robot_link& rlink, int stopatthisnumofintersections);
 
+//functions declared in loading.cc
+bool get_weight(robot_link& rlink);
+
 enum enum_matchings {
 	//Matches enums for use in move_from
 	start_to_ball1 = 0,
