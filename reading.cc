@@ -8,6 +8,26 @@
 using namespace std;
 // this is untested prototype code
 
+
+void initialise(robot_link& rlink){
+	//initialises the robot link
+#ifdef __arm__
+   if (!rlink.initialise ("127.0.0.1")) { 
+	    std::cout << "Local Hardware Communication Error" << std::endl;
+		rlink.print_errs("  ");        // setup for local hardware
+	}
+#else
+   if (!rlink.initialise (ROBOT_NUM)) { // setup the link
+		std::cout << "Cannot initialise link" << std::endl;
+		rlink.print_errs("  ");
+	}
+	
+	rlink.command (RAMP_TIME, 0);
+#endif
+	
+	
+}
+
 int read(int input, robot_link& rlink) 
 {
 	// needs to be updates with the final chip adress of chip 1 which will need to be used as a function inpute.g. rlink.request (READ_PORT_0, chipadress);
@@ -87,29 +107,31 @@ int readbit(int port, int bit, robot_link& rlink){
 	
 }
 
-void turnright(robot_link& rlink){
-	//robot_link rlink;
-	//initialise(rlink);
-	int n= 0; // for infinite loop
-	int left, middle, right;
-	left =  readbit(0, 6, rlink);
-	middle = readbit(0, 5, rlink);
-	right = readbit(0, 4, rlink); 
-	stopwatch watch;
-	watch.start();
-	while(n<1){
-		rlink.command(MOTOR_1_GO, 127);
-		rlink.command(MOTOR_2_GO, 0);
-		// UPDATE THIS SO WE MOVE TO CENTRE OF INTERSECTION AND THEN SPIN BOTH WHEELS IN OPPOSITE DIRECTIONS 
-		if(watch.read()>2000){
-			middle = readbit(0, 5, rlink);
-			if(middle ==1){
-				n= 1;
-				rlink.command(MOTOR_1_GO, 0);
-			}
-			
-		}
-	
-			
+colour measurecolour(robot_link& rlink){
+	int reading = rlink.request(ADC0); 
+	int whitelower =172; //these thresholds need to be fine tuned
+	int whiteupper  =255;
+	int yellowlower = 150;
+	int yellowupper = 171;
+	int multilower = 100;
+	int multiupper = 149;
+	int ambientlower = 0;
+	int ambientupper = 99;
+	if(reading < whiteupper && reading > whitelower){
+		return white;
 	}
+	else if(reading < yellowupper && reading > yellowlower){
+		return yellow;
+	}
+	else if(reading < multiupper && reading > multilower){
+		return multicolour;
+	}
+	else if(reading < ambientupper && reading > ambientlower){
+		return ambient;
+	}
+	else{
+		cout << "invalid reading of " << reading << endl;
+	}
+	
 }
+

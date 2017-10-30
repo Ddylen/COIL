@@ -3,12 +3,49 @@
 #include <robot_instr.h>
 #include <robot_link.h>
 #include <stopwatch.h>
+#include <unistd.h>
 
 using namespace std;
 
 const int wait_time_ball_roll_over_weight_switch = 3000;
 const int release_color_box_actuator = 0x00;
 const int weight_switch_mask = 0x10; //00010000
+
+void set_led_on(robot_link& rlink, int led_number) {
+	//This function turns off all other ball type LEDs and turns on the
+	//specified by led_number
+	//set to 0 for all off
+	// bitand clause keeps actuator bits low
+	if (led_number == 1) {
+		rlink.command(WRITE_PORT_1, 0xFB bitand 0xFC);
+	} else if (led_number == 2) {
+		rlink.command(WRITE_PORT_1, 0xF7 bitand 0xFC);
+	} else if (led_number == 3) {
+		rlink.command(WRITE_PORT_1, 0xEF bitand 0xFC);
+	} else if (led_number == 4) {
+		rlink.command(WRITE_PORT_1, 0xDF bitand 0xFC);
+	} else if (led_number == 5) {
+		rlink.command(WRITE_PORT_1, 0xBF bitand 0xFC);
+	} else if (led_number == 0) {
+		rlink.command(WRITE_PORT_1, 0xFF bitand 0xFC);
+	} else {
+		cout << "ERROR in loading.cc set_led_on. Number other than 0 to 5 given!" << endl;
+	}
+}
+
+void set_actuator(robot_link& rlink, int number, int high){
+	if(number == 1 && high ==1){
+		rlink.command(WRITE_PORT_1, 0xFE);	
+	}
+	if(number ==2 && high ==1){
+		rlink.command(WRITE_PORT_1, 0xFD);	
+	}
+	if(high ==0){
+		rlink.command(WRITE_PORT_1,0xFC);
+	}
+}
+
+
 
 
 bool get_weight(robot_link& rlink) {
@@ -34,25 +71,43 @@ bool get_weight(robot_link& rlink) {
 	return was_weight_switch_pressed;
 }
 
-/*
-void measure_colour(robot_link& rlink){
-	int colour_value = rlink.request(ADC0);
-	char colour = "I"; // for invalid
-	// all thresholds here are arbitrary, need to be tested
-	if (colour_value < 60 && colour_value >0){
-		colour = "W";  // for white
-	}
-	
-	if (colour_value < 120 && colour_value >90){
-		colour = "Y";  // for yellow
-	}
-	
-	if (colour_value < 250 && colour_value >200){
-		colour = "M";  // for multicolour
-	}
-	colourlist.push_back(colour); //adds colour to global list
-	
-	
+colour measure_colour(robot_link& rlink){
+
+		colour col = measurecolour(rlink);
+		cout<< col << " " << rlink.request(ADC0) << endl;
+		if(col  == yellow){
+			//cout<< "Yellow " << rlink.request(ADC0) << endl;
+			return yellow;
+		}
+		if(col  == white){
+			//cout<< "White " << rlink.request(ADC0) << endl;
+			return white;
+		}
+		if(col  == multicolour){
+			//cout<< "Multicolour " << rlink.request(ADC0) << endl;
+			return multicolour;
+		}
+		if(col  == ambient){
+			//cout<< "Ambient " << rlink.request(ADC0) << endl;
+			return ambient;
+		}
+		
+			
 }
-*/
-// the above is throwing some weird errors, not sure why
+
+bool measure_weight(robot_link& rlink){
+	// untested
+	int detecttime = 5; // time sensor waits for reading for
+	stopwatch watch;
+	watch.start();
+	bool switchfired = false;
+	while(watch.read()<detecttime*1000000){
+		if(readbit(0, 3, rlink) == 1){
+			switchfired = true;
+			return switchfired;
+		}
+	return false; // if switch doesnt detect anything in detecttime
+	
+	}
+}
+
