@@ -1,6 +1,6 @@
 # Automatically generated Makefile
-TEST :  upperlevel.o TEST.o reading.o movement.o loading.o
-	 g++ -L/export/teach/1BRobot -o TEST  upperlevel.o  TEST.o  reading.o  movement.o  loading.o  -lrobot
+a.out :  upperlevel.o TEST.o reading.o movement.o loading.o
+	 g++ -L/export/teach/1BRobot -o a.out  upperlevel.o  TEST.o  reading.o  movement.o  loading.o  -lrobot
 
 upperlevel.o: upperlevel.cc header.h
 	 g++ -ansi -Wall -g -I/export/teach/1BRobot -c upperlevel.cc

@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <unistd.h>
 
+#include <stdlib.h> //For rand
+#include <time.h>  
+
 using namespace std;
 
 void test_long_path(robot_link& rlink) {
@@ -31,18 +34,7 @@ void test_long_path(robot_link& rlink) {
 		spin(rlink);
 		cout << "TEST.cc main restarting loop" << endl;
 	}
-	//cout << "TEST.cc main starting turn left" << endl;
-	//left(rlink);
-	//cout << "TEST.cc main starting forwards" << endl;
-	//forwards(rlink, 4);
-	//spin(rlink);
-	//forwards(rlink, 6);
-	//right(rlink);
-	//forwards(rlink,3);
-	//right(rlink);
-	//forwards(rlink,2);
-	//right(rlink);
-	//sweepforline(rlink);
+	
 }
 
 void test_colour_sensor(robot_link& rlink) {
@@ -163,41 +155,249 @@ void balldetectiontest(robot_link& rlink){
 	usleep(1000000*3);// time for arms to open, might be some space to merge this time with waits above
 	rlink.command(MOTOR_3_GO, 0); //shut it off
 	
-	bool weightbool = measure_weight(rlink);
+	bool weightbool = get_weight(rlink);
 	
 	balllist.push_back(ball(col, weightbool));
 	
 }
+
+
+void test_sreverse(robot_link& rlink) {
+	
+	forwards_untill_impact(rlink);
+	backwardspedal(rlink, 500);
+	turn_left_until_first_line(rlink);
+	forwards(rlink,2);
+	spin(rlink);
+	forwards(rlink,2);	
+	forwardspedal(rlink, 1000);	
+	
+	sreverese(rlink);	
+	forwardspedal(rlink,5000);
+	sweepforline(rlink);
+	
+	sreverese(rlink);
+	forwardspedal(rlink,5000);
+	sweepforline(rlink);
+	
+	sreverese(rlink);
+	forwardspedal(rlink,5000);
+	sweepforline(rlink);
+	
+	sreverese(rlink);
+	forwardspedal(rlink,5000);
+	sweepforline(rlink);
+	
+	sreverese(rlink);
+	forwardspedal(rlink,5000);
+	sweepforline(rlink);
+	
+}
+
+void test_consecutive_ball_delivery(robot_link& rlink) {
+	move_from(rlink, ball1_to_ref);
+	move_from(rlink, ref_to_D1);
+	move_from(rlink, D1_to_ref);
+	move_from(rlink, ref_to_D2);
+	move_from(rlink, D2_to_ref);
+	move_from(rlink, ref_to_D3);
+	move_from(rlink, D3_to_ref);
+	move_from(rlink, ref_to_DR);
+	move_from(rlink, DR_to_ref);
+	move_from(rlink, ref_to_start);
+}
+
+void test_continual_ball_delivery(robot_link& rlink) {
+	srand(time(NULL));
+	while(true) {
+		int random_num = rand() % 4; //0, 1, 2 or 3
+		if (random_num == 0) {
+			cout << "Delivering to DR" << endl;
+			move_from(rlink, ref_to_DR);
+			move_from(rlink, DR_to_ref);
+		} else if (random_num == 1) {
+			cout << "Delivering to D1" << endl;
+			move_from(rlink, ref_to_D1);
+			move_from(rlink, D1_to_ref);	
+		} else if (random_num == 2) {
+			cout << "Delivering to D2" << endl;
+			move_from(rlink, ref_to_D2);
+			move_from(rlink, D2_to_ref);
+		} else {
+			cout << "Delivering to D3" << endl;
+			move_from(rlink, ref_to_D3);
+			move_from(rlink, D3_to_ref);
+		}
+		
+	}
+}
+
+void ballID(robot_link& rlink) {
+
+
+	vector<ball> balllist; //stores list of balls
+	
+
+	set_actuator(rlink, 2, 0); //reset kicker
+	
+	
+	
+	for(int i=0;i<999;i++){
+	
+	
+		int speed = 127;
+		double time_for_close_arms = 0.85; //time for arms to close/open
+		double time_to_wait_for_weight_switch = 6;
+	
+
+	
+		rlink.command(MOTOR_3_GO, (speed+128)); //close arms , we tested with +127
+		stopwatch watch;
+		watch.start();
+		
+		bool weightbool = false; 
+		while(watch.read()< time_for_close_arms * 1000){
+			if(get_weight(rlink) == true){
+				weightbool = true;
+				} 
+		}
+			
+		rlink.command(MOTOR_3_GO, 0);
+		
+		while(watch.read() < time_to_wait_for_weight_switch * 1000) {
+			if(get_weight(rlink) == true){
+				weightbool = true;
+			}
+		}
+		
+		
+		
+		colour col = measurecolour(rlink);
+		
+		cout << "weightbool is "<< weightbool<< endl;
+		cout << "colour is " << col << endl;
+		
+		set_actuator(rlink, 2, 1); //kick ball out
+		usleep(1000000*2);
+		set_actuator(rlink, 2, 0); //reset kicker
+		
+		
+		
+		rlink.command(MOTOR_3_GO, speed); //open arms
+		usleep(1000000*time_for_close_arms);// time for arms to open, might be some space to merge this time with waits above
+		rlink.command(MOTOR_3_GO, 0); //shut it off
+		balllist.push_back(ball(col, weightbool));
+		
+		
+
+		//code below chooses which LED to light
+		cout << " ALERT " << endl;
+		cout << " ALERT " << endl;
+		cout << " ALERT " << endl;
+		
+		if(balllist.back().ball_colour == white && balllist.back().weight == false){
+			cout << "Picked up ball 1" << endl;
+			set_led_on(rlink,1);
+			
+		}
+		
+		if((balllist.back().ball_colour == white && balllist.back().weight == true)){
+			cout << "Picked up ball 2" << endl;
+			set_led_on(rlink,2);
+			
+			
+		}
+		
+		if(balllist.back().ball_colour == yellow && balllist.back().weight == false){
+			cout << "Picked up ball 3" << endl;
+			set_led_on(rlink,3);
+			
+		}
+		
+		if(balllist.back().ball_colour == yellow && balllist.back().weight == true){
+			cout << "Picked up ball 4" << endl;	
+			set_led_on(rlink,4);
+		}
+		if(balllist.back().ball_colour ==  multicolour){
+			cout << "Picked up ball 5" << endl;	
+			set_led_on(rlink,5);
+		}
+		
+
+		cout << " ALERT " << endl;
+		cout << " ALERT " << endl;
+		cout << " ALERT " << endl;
+		usleep(5*1000000);
+	}
+	
+	
+	
+}
+/*
 int main(){
+	
 	cout << "program started"<< endl;
 	robot_link rlink;
 	initialise(rlink);
 	
-	//loadpositiontest(rlink); //test1
-	//sweeptest(rlink); //test2
-	move_from(rlink, ref_to_D3); //test3
+	stopwatch watch;
+	watch.start();
+	vector<ball> balllist;
+	//balllist.push_back(ball(white, 0));
+	balllist.push_back(ball(white, 1));
+	balllist.push_back(ball(yellow, 0));
+	balllist.push_back(ball(yellow, 1));
+	balllist.push_back(ball(multicolour, 0));
 	
-	/*
-	forwards(rlink,3);
-	forwardspedal(rlink,200);
-	turn_left_until_first_line(rlink);
-	forwardspedal(rlink,3250);
-	spin(rlink);
-	turn_right_until_first_line(rlink);
-	forwardspedal(rlink, 3000);
+	//takes timer started in start()
+	set_actuator(rlink, 2, 0); //put dropoff in delivery position
+	int running_out_of_time_time =240;
+	// conditional delivery section of code
+	while(balllist.size()>0){
+		if(watch.read()>(1000*running_out_of_time_time)){
+			move_from(rlink, ref_to_start);
+			break;
+		}
+			
+		if(balllist[0].ball_colour == white && balllist[0].weight == false){
+			cout << "Delivering ball 1" << endl;
+			move_from(rlink, ref_to_D1);
+			dropball(rlink);
+			move_from(rlink, D1_to_ref);
+			
+		}
+		
+		if((balllist[0].ball_colour == white && balllist[0].weight == true) || (balllist[0].ball_colour ==  multicolour && balllist[0].weight == false)){
+			cout << "Delivering ball 2/ ball 5" << endl;
+			move_from(rlink, ref_to_DR);
+			dropball(rlink);
+			move_from(rlink, DR_to_ref);
+			
+			
+		}
+		
+		if(balllist[0].ball_colour == yellow && balllist[0].weight == false){
+			cout << "Delivering ball 3" << endl;
+			move_from(rlink, ref_to_D2);
+			dropball(rlink);
+			move_from(rlink, D2_to_ref);
+			
+		}
+		
+		if(balllist[0].ball_colour == yellow && balllist[0].weight == true){
+			cout << "Delivering ball 4" << endl;
+			move_from(rlink, ref_to_D3);
+			dropball(rlink);
+			move_from(rlink, D3_to_ref);
+			
+			
+		}
+		balllist.erase(balllist.begin());
 	
-	forwards_untill_impact(rlink);
-	for(int i=0;i<5; i++){
-		sreverese(rlink);
-		forwardspedal(rlink,500);
-		sweepforline(rlink);
-		forwards_untill_impact(rlink);
-		forwardspedal(rlink, 500);
-	}
-	*/
-	
-	
-	return 0;
-
-
 }
+	
+
+	
+	
+}
+*/

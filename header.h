@@ -2,6 +2,7 @@
 #include <robot_instr.h>
 #include <robot_link.h>
 #include <vector>
+#include <stopwatch.h>
 #define ROBOT_NUM 2
 using namespace std;
 void initialise(robot_link& rlink);
@@ -13,18 +14,15 @@ enum colour {
 	white = 1,
 	yellow = 2,
 	multicolour = 3,
+	outofbounds = 4
 	
 };
 
 enum enum_matchings {
 	//Matches enums for use in move_from
-	start_to_ball1 = 0,
-	ball1_to_ball2 = 1,
-	ball2_to_ball3 = 2,
-	ball3_to_ball4 = 3,
-	ball4_to_ball5 = 4,
-	ball5_to_ball6 = 5,
-	ball6_to_ref = 9,
+	start_to_ball6 = 0,
+	ball_to_nearestrightball = 1,
+	ball1_to_ref = 9,
 	ref_to_D1 = 10,
 	D1_to_ref = 11,
 	ref_to_D2 = 20,
@@ -37,6 +35,23 @@ enum enum_matchings {
 };
 
 
+
+
+struct ball {
+	//for storing data on the balls currently in the robot
+	
+	ball(colour input_colour, bool input_weight) {
+		ball_colour = input_colour;
+		weight = input_weight;
+	}
+	
+	colour ball_colour;
+	bool weight; //True for heavy
+	
+	friend ostream& operator<<(ostream& os, const ball& inp_ball);
+	
+};
+
 //functions declared in reading.cc
 int read(int input, robot_link& rlink); 
 int readbit(int port, int bit, robot_link& rlink);
@@ -48,9 +63,6 @@ void forwards(robot_link& rlink, int stopatthisnumofintersections);
 void sweepforline(robot_link& rlink);
 void left(robot_link& rlink);
 void right(robot_link& rlink);
-
-void right(robot_link& rlink);
-void left(robot_link& rlink);
 void spin(robot_link& rlink);
 void forwards_untill_impact(robot_link& rlink); 
 
@@ -60,27 +72,19 @@ void backwardspedal(robot_link& rlink, int timeout);
 void turn_left_until_first_line(robot_link& rlink);
 void turn_right_until_first_line(robot_link& rlink);
 void sreverese(robot_link& rlink);
-
 void move_from(robot_link& rlink, enum_matchings input);// NOT FINISHED
 
 //functions declared in loading.cc
 bool get_weight(robot_link& rlink);
 void set_led_on(robot_link& rlink, int led_number);
 void set_actuator(robot_link& rlink, int number, int high);
+void dropball(robot_link& rlink);
+ostream& operator<<(ostream& os, const ball& inp_ball);
 
-void dropball(robot_link& rlink); // NOT WRITTEN YET
+//functions declared in upperlevel.cc
+vector<ball> load(robot_link& rlink);
+void deliver(robot_link& rlink, vector<ball>& balllist, stopwatch& watch);
 
-struct ball {
-	
-	ball(colour input_colour, bool input_weight) {
-		ball_colour = input_colour;
-		weight = input_weight;
-	}
-	
-	colour ball_colour;
-	bool weight; //True for heavy
-	
-};
 
 
 

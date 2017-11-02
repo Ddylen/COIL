@@ -4,6 +4,7 @@
 #include <robot_link.h>
 #include <stopwatch.h>
 #include <unistd.h>
+#include <string>
 
 using namespace std;
 
@@ -12,8 +13,7 @@ const int release_color_box_actuator = 0x00;
 const int weight_switch_mask = 0x10; //00010000
 
 void set_led_on(robot_link& rlink, int led_number) {
-	//This function turns off all other ball type LEDs and turns on the
-	//specified by led_number
+	//This function turns off all other ball type LEDs and turns on the specified by led_number
 	//set to 0 for all off
 	// bitand clause keeps actuator bits low
 	if (led_number == 1) {
@@ -34,6 +34,7 @@ void set_led_on(robot_link& rlink, int led_number) {
 }
 
 void set_actuator(robot_link& rlink, int number, int high){
+	//sets a specific actuator to low or high
 	if(number == 1 && high ==1){
 		rlink.command(WRITE_PORT_1, 0xFE);	
 	}
@@ -45,33 +46,30 @@ void set_actuator(robot_link& rlink, int number, int high){
 	}
 }
 
-
-
-
-bool get_weight(robot_link& rlink) {
+bool get_weight(robot_link& rlink) { //NEEDS TO BE CHANGED
+	// releaes ball from light sensing area to allow it to rolls over weight switch
+	
 	//Release the actuator that is holding the ball in the LDR sensing box
 	
-	rlink.command(WRITE_PORT_1, release_color_box_actuator);
 	
 	//Poll the weight switch to see if is ever pressed during the waiting period
 	stopwatch watch;
 	watch.start();
 	
 	bool was_weight_switch_pressed = false;
-	
-	while(watch.read() < wait_time_ball_roll_over_weight_switch) {
-		int value_read_from_PCF = -99999;
-		value_read_from_PCF = rlink.request(READ_PORT_0);
+
 		
-		if (value_read_from_PCF & weight_switch_mask) {
-			was_weight_switch_pressed = true;
+	if (readbit(0, 3, rlink) == 1) { //will be a different bit in practice
+		was_weight_switch_pressed = true;
 		}
-	}
+	
+	
 	
 	return was_weight_switch_pressed;
 }
 
 colour measure_colour(robot_link& rlink){
+	//measures ADC reading of colour
 
 		colour col = measurecolour(rlink);
 		cout<< col << " " << rlink.request(ADC0) << endl;
@@ -91,23 +89,49 @@ colour measure_colour(robot_link& rlink){
 			//cout<< "Ambient " << rlink.request(ADC0) << endl;
 			return ambient;
 		}
-		
+		return outofbounds; // new addition to get rid of that warning
 			
 }
 
-bool measure_weight(robot_link& rlink){
-	// untested
-	int detecttime = 5; // time sensor waits for reading for
+void dropball(robot_link& rlink){
+
+	set_actuator(rlink, 1, 1);
 	stopwatch watch;
 	watch.start();
-	bool switchfired = false;
-	while(watch.read()<detecttime*1000000){
-		if(readbit(0, 3, rlink) == 1){
-			switchfired = true;
-			return switchfired;
-		}
-	return false; // if switch doesnt detect anything in detecttime
-	
+	while(watch.read()<3000) {
+		/*
+		set_actuator(rlink, 2, 1);// shaking motion
+		usleep(1000000*0.25);
+		set_actuator(rlink, 2, 0);
+		usleep(1000000*0.25);
+		*/
+		
 	}
+	
+	set_actuator(rlink, 1, 0);
+	usleep(1000000*1);
+	
 }
+
+ostream& operator <<(ostream& os, const ball& inp_ball) {
+	string ball_colour = "";
+	if (inp_ball.ball_colour == white) {
+		ball_colour = "white";
+	} else if (inp_ball.ball_colour == yellow) {
+		ball_colour = "yellow";
+	} else if (inp_ball.ball_colour == multicolour) {
+		ball_colour = "multi-colour";
+	} else {
+		ball_colour = "colour unknown";
+	}
+	string ball_weight = "";
+	if (inp_ball.weight) {
+		ball_weight = "Heavy";
+	} else {
+		ball_weight = "Light";
+	}
+	os << "Ball colour: " << ball_colour << " Ball weight: " << ball_weight;
+	return os;
+}
+
 

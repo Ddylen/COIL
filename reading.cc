@@ -31,7 +31,7 @@ void initialise(robot_link& rlink){
 int read(int input, robot_link& rlink) 
 {
 	// needs to be updates with the final chip adress of chip 1 which will need to be used as a function inpute.g. rlink.request (READ_PORT_0, chipadress);
-	int output;
+	int output = -666; //for clear debugging
 	if(input ==0){
 		output = rlink.request (READ_PORT_0);
 	}
@@ -101,7 +101,7 @@ int readbit(int port, int bit, robot_link& rlink){
 	if(output == true){
 		return 1;
 	}
-	if(output == false){
+	else{
 		return 0;
 	}
 	
@@ -109,28 +109,31 @@ int readbit(int port, int bit, robot_link& rlink){
 
 colour measurecolour(robot_link& rlink){
 	int reading = rlink.request(ADC0); 
-	int whitelower =172; //these thresholds need to be fine tuned
+	cout << "LRD reading is " << reading << endl;
+	int whitelower =189; //these thresholds need to be fine tuned
 	int whiteupper  =255;
-	int yellowlower = 150;
-	int yellowupper = 171;
-	int multilower = 100;
-	int multiupper = 149;
+	int yellowlower = 170;
+	int yellowupper = 188;
+	int multilower = 110;
+	int multiupper = 169;
 	int ambientlower = 0;
-	int ambientupper = 99;
-	if(reading < whiteupper && reading > whitelower){
+	int ambientupper = 109; // remove in final version of code
+	//cout << "reading is " << reading << endl;
+	if(reading <= whiteupper && reading >= whitelower){
 		return white;
 	}
-	else if(reading < yellowupper && reading > yellowlower){
+	else if(reading <= yellowupper && reading >= yellowlower){
 		return yellow;
 	}
-	else if(reading < multiupper && reading > multilower){
+	else if(reading <= multiupper && reading >= multilower){
 		return multicolour;
 	}
-	else if(reading < ambientupper && reading > ambientlower){
-		return ambient;
+	else if(reading <= ambientupper && reading >= ambientlower){
+		return ambient; // change to white
 	}
 	else{
 		cout << "invalid reading of " << reading << endl;
+		return outofbounds; // change to white
 	}
 	
 }
