@@ -65,6 +65,7 @@ void left(robot_link& rlink);
 void right(robot_link& rlink);
 void spin(robot_link& rlink);
 void forwards_untill_impact(robot_link& rlink); 
+void changespeed(robot_link& rlink, int motor1speed, int motor2speed);
 
 void forwardspedal(robot_link& rlink, int time);
 void full_speed_forwards(robot_link& rlink); //For debugging the wheel rpm differences
@@ -79,12 +80,18 @@ bool get_weight(robot_link& rlink);
 void set_led_on(robot_link& rlink, int led_number);
 void set_actuator(robot_link& rlink, int number, int high);
 void dropball(robot_link& rlink);
+void dropball_with_ram(robot_link& rlink, int num_of_rams);
 ostream& operator<<(ostream& os, const ball& inp_ball);
 
 //functions declared in upperlevel.cc
 vector<ball> load(robot_link& rlink);
 void deliver(robot_link& rlink, vector<ball>& balllist, stopwatch& watch);
 
+// declared is test.cc
+void ballID(robot_link& rlink);
+void test_colour_sensor(robot_link& rlink);
+void continual_drop(robot_link& rlink);
+void balldetectiontest(robot_link& rlink);
 
 
 

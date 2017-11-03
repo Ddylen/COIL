@@ -113,6 +113,19 @@ void dropball(robot_link& rlink){
 	
 }
 
+void dropball_with_ram(robot_link& rlink, int num_of_rams) {
+	set_actuator(rlink, 1, 1);
+	stopwatch watch;
+	watch.start();
+	usleep(3*1000000);
+	for(int i = 0; i < num_of_rams; i++) {
+		backwardspedal(rlink, 100);
+		forwards_untill_impact(rlink);
+	}
+	set_actuator(rlink, 1, 0);
+	//there was a 1 second sleep here
+}
+
 ostream& operator <<(ostream& os, const ball& inp_ball) {
 	string ball_colour = "";
 	if (inp_ball.ball_colour == white) {

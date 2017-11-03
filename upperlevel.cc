@@ -4,8 +4,9 @@
 #include <robot_link.h>
 #include <stopwatch.h>
 #include <unistd.h>
+#include <stdlib.h>
 
-vector<ball> load(robot_link& rlink){
+vector<ball> load(robot_link& rlink, int num_balls_to_pickup){
 	//contains code for loading section of routine, returns list of balls for use in deliver
 
 	vector<ball> balllist; //stores list of balls
@@ -16,12 +17,12 @@ vector<ball> load(robot_link& rlink){
 	
 	
 	
-	for(int i=0;i<6;i++){
+	for(int i=0;i<num_balls_to_pickup;i++){
 	
 	
 		int speed = 127;
 		double time_for_close_arms = 1; //time for arms to close/open
-		double time_to_wait_for_weight_switch = 6;
+		double time_to_wait_for_weight_switch = 3.5;
 	
 
 	
@@ -49,7 +50,7 @@ vector<ball> load(robot_link& rlink){
 		colour col = measurecolour(rlink);
 
 		set_actuator(rlink, 2, 1); //kick ball out
-		usleep(1000000*2);
+		usleep(1000000*1);
 		set_actuator(rlink, 2, 0); //reset kicker
 		
 		rlink.command(MOTOR_3_GO, speed); //open arms
@@ -89,7 +90,7 @@ vector<ball> load(robot_link& rlink){
 			set_led_on(rlink,5);
 		}
 		
-		if(i<5){
+		if(i<num_balls_to_pickup - 1){
 			move_from(rlink, ball_to_nearestrightball);
 		}
 		
@@ -103,18 +104,19 @@ void deliver(robot_link& rlink, vector<ball>& balllist, stopwatch& watch){
 	//takes timer started in start()
 	set_actuator(rlink, 1, 0); //put dropoff in delivery position
 	move_from(rlink, ball1_to_ref);
-	int running_out_of_time_time =240;
+	int running_out_of_time_time =255;
 	// conditional delivery section of code
 	while(balllist.size()>0){
 		if(watch.read()>(1000*running_out_of_time_time)){
-			move_from(rlink, ref_to_start);
+			cout << "Returning to start due to running out of time" << endl;
+
 			break;
 		}
 			
 		if(balllist[0].ball_colour == white && balllist[0].weight == false){
 			cout << "Delivering ball 1" << endl;
 			move_from(rlink, ref_to_D1);
-			dropball(rlink);
+			dropball_with_ram(rlink, 2);
 			move_from(rlink, D1_to_ref);
 			
 		}
@@ -122,7 +124,7 @@ void deliver(robot_link& rlink, vector<ball>& balllist, stopwatch& watch){
 		if((balllist[0].ball_colour == white && balllist[0].weight == true) || (balllist[0].ball_colour == yellow && balllist[0].weight == true)){
 			cout << "Delivering ball 2/ ball 4" << endl;
 			move_from(rlink, ref_to_DR);
-			dropball(rlink);
+			dropball_with_ram(rlink, 2);
 			move_from(rlink, DR_to_ref);
 			
 			
@@ -131,7 +133,7 @@ void deliver(robot_link& rlink, vector<ball>& balllist, stopwatch& watch){
 		if(balllist[0].ball_colour == yellow && balllist[0].weight == false){
 			cout << "Delivering ball 3" << endl;
 			move_from(rlink, ref_to_D2);
-			dropball(rlink);
+			dropball_with_ram(rlink, 5);
 			move_from(rlink, D2_to_ref);
 			
 		}
@@ -139,25 +141,28 @@ void deliver(robot_link& rlink, vector<ball>& balllist, stopwatch& watch){
 		if(balllist[0].ball_colour ==  multicolour){
 			cout << "Delivering ball 5" << endl;
 			move_from(rlink, ref_to_D3);
-			dropball(rlink);
+			dropball_with_ram(rlink, 2);
 			move_from(rlink, D3_to_ref);
 			
 			
 		}
 		balllist.erase(balllist.begin());
 	
-}
+	}
+	move_from(rlink, ref_to_start);
 	
 
 	
 	
 }
 
-void main_code(robot_link& rlink, stopwatch& mainwatch) {
+void main_code(robot_link& rlink, stopwatch& mainwatch, int num_balls_to_pickup) {
 	vector<ball> balls;
+	stopwatch wa;
+	wa.start();
 	
-	balls = load(rlink);
-
+	balls = load(rlink, num_balls_to_pickup);
+	cout << " Time at loading end is " << endl;
 	cout << "Ball list: " << endl;
 	for (unsigned int i = 0; i < balls.size(); i++) {
 		cout << "Ball " << i << " is " << balls[i] << endl;
@@ -166,41 +171,45 @@ void main_code(robot_link& rlink, stopwatch& mainwatch) {
 	deliver(rlink, balls, mainwatch);
 }
 
-
-int main(){
+/*
+	vector<ball> balllist;
+	balllist.push_back(ball(white, 0));
+	balllist.push_back(ball(white, 1));
+	balllist.push_back(ball(yellow, 0));
+	balllist.push_back(ball(yellow, 1));
+	balllist.push_back(ball(multicolour, 0));
+	balllist.push_back(ball(yellow, 1));
+	
+	*/
+	
+int main(int argc, const char* argv[]){
+	
+	int num_balls_to_pickup = 6;
+	if (argc > 1) {
+		num_balls_to_pickup = atoi(argv[1]);
+	}
+	
 	
 	stopwatch mainwatch;
 	mainwatch.start();
 	cout << "program started"<< endl;
+	cout << "Will pickup " << num_balls_to_pickup << " balls" << endl;
 	robot_link rlink;
 	initialise(rlink);
 	
-	while(true){
 	
-	dropball(rlink);
-	usleep(1000000 * 2);
-	}
+	//main_code(rlink, mainwatch, num_balls_to_pickup);
+	test_colour_sensor(rlink);
 	
-
 	
-	/*
-	vector<ball> balllist = load(rlink);
-	cout << "load time is " << mainwatch.read() << endl;
 	
-	deliver(rlink, balllist, mainwatch);
-	cout << "Deliver time is " << mainwatch.read() << endl;
-	
-	move_from(rlink, ref_to_start);
-	cout << "Total time is " << mainwatch.read() << endl;
-	*/
 	return 0;
-	
 }
 
 	
 	
 	
-	
+
 	
 	
 	

@@ -10,6 +10,11 @@
 #include <stdlib.h> //For rand
 #include <time.h>  
 
+//bash-4.2$ scp a.out.arm team@wlan-robot2.private:a.out.arm
+//bash-4.2$ slogin team@wlan-robot2.private
+
+
+
 using namespace std;
 
 void test_long_path(robot_link& rlink) {
@@ -33,6 +38,17 @@ void test_long_path(robot_link& rlink) {
 		cout << "TEST.cc main starting spin()" << endl;
 		spin(rlink);
 		cout << "TEST.cc main restarting loop" << endl;
+	}
+	
+}
+void continual_drop(robot_link& rlink){
+	while(true){
+		set_actuator(rlink, 1, 1);
+		stopwatch watch;
+		watch.start();
+		usleep(3*1000000);
+		set_actuator(rlink, 1, 0);
+		usleep(1*1000000);
 	}
 	
 }
@@ -246,7 +262,7 @@ void ballID(robot_link& rlink) {
 	
 	
 		int speed = 127;
-		double time_for_close_arms = 0.85; //time for arms to close/open
+		double time_for_close_arms = 0.9; //time for arms to close/open
 		double time_to_wait_for_weight_switch = 6;
 	
 

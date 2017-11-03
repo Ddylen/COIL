@@ -110,14 +110,14 @@ int readbit(int port, int bit, robot_link& rlink){
 colour measurecolour(robot_link& rlink){
 	int reading = rlink.request(ADC0); 
 	cout << "LRD reading is " << reading << endl;
-	int whitelower =189; //these thresholds need to be fine tuned
+	int whitelower =185; //these thresholds need to be fine tuned
 	int whiteupper  =255;
-	int yellowlower = 170;
-	int yellowupper = 188;
-	int multilower = 110;
-	int multiupper = 169;
+	int yellowlower = 166;
+	int yellowupper = 184;
+	int multilower = 20;
+	int multiupper = 165;
 	int ambientlower = 0;
-	int ambientupper = 109; // remove in final version of code
+	int ambientupper = 19; 
 	//cout << "reading is " << reading << endl;
 	if(reading <= whiteupper && reading >= whitelower){
 		return white;

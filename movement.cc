@@ -45,8 +45,8 @@ void forwards(robot_link& rlink, int stopatthisnumofintersections){
 	
 	int left, middle, right, threshold, n;
 	int cruise, slow, veryslow, stop; //speeds
-	cruise = 110;
-	slow =  60;
+	cruise = 115;
+	slow =  65;
 	veryslow = 20;
 	stop = 0;
 	threshold = 0; 
@@ -476,7 +476,7 @@ void turn_right_until_first_line(robot_link& rlink) {
 void sreverese(robot_link& rlink){
 	cout << "movement.cc Sreverse() started" << endl;
 	
-	int slow = 180;
+	int slow = 148;
 	int fast = 250;
 	int timepersection = 1.95*1000000; 
 	backwardspedal(rlink, 250);
@@ -485,6 +485,8 @@ void sreverese(robot_link& rlink){
 	usleep(timepersection);
 	changespeed(rlink, slow, fast);
 	usleep(timepersection);
+	changespeed(rlink,0,0);
+	usleep(0.2*1000000);
 	cout << "movement.cc Sreverse() complete" << endl;
 	
 	
@@ -576,7 +578,7 @@ void move_from(robot_link& rlink, enum_matchings input){
 		}
 		
 		if (input == D1_to_ref) {
-			backwardspedal(rlink, 200);
+			backwardspedal(rlink, 300);
 			spin(rlink);
 			left(rlink);
 			forwards(rlink, 2);
@@ -605,11 +607,7 @@ void move_from(robot_link& rlink, enum_matchings input){
 			spin(rlink);
 			left(rlink);
 			forwards(rlink, 6);
-			left(rlink);
-			forwards(rlink, 1);
-			spin(rlink);
-			forwards(rlink, 3);
-			changespeed(rlink,0,0);
+			
 		}
 		
 			
